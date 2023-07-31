@@ -64,24 +64,28 @@
   const addTodo = (e) => {
     e.preventDefault();
 
-    const todo = {
-      content: $todoInput.value,
-      completed: false,
-    };
-
-    fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(todo)
-    })
-      .then(getTodos)
-      .then(() => {
-        $todoInput.value = '';
-        $todoInput.focus();
+    if($todoInput.value === ''){
+      alert('내용을 입력해주세요.')
+    } else{
+      const todo = {
+        content: $todoInput.value,
+        completed: false,
+      };
+  
+      fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(todo)
       })
-      .catch((error) => console.error(error));
+        .then(getTodos)
+        .then(() => {
+          $todoInput.value = '';
+          $todoInput.focus();
+        })
+        .catch((error) => console.error(error));
+    }
   };
 
   const toggleTodo = (e) => {
@@ -142,6 +146,17 @@
       body: JSON.stringify({content})
     }).then(getTodos).catch((error) => console.error(error))
   }
+
+  const removeTodo = (e) => {
+    if(e.target.className !== 'todo_remove_button') return
+    const $item = e.target.closest('.item')
+    const id = $item.dataset.id
+
+    fetch(`${API_URL}/${id}`, {
+      method: 'DELETE',
+    }).then(getTodos)
+    .catch((error) => console.error(error))
+  }
   
 
   const init = () => {
@@ -152,6 +167,7 @@
     $todos.addEventListener('click', toggleTodo);
     $todos.addEventListener('click', cahngeEditMode)
     $todos.addEventListener('click', editTodo)
+    $todos.addEventListener('click', removeTodo)
   };
 
   init();
